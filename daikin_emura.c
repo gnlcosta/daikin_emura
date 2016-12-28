@@ -49,6 +49,8 @@
 #define DAIKIN_HDR_1         0xDA // header
 #define DAIKIN_HDR_2         0x27 // header
 
+#define CMD_TRANSM_TIMES     3
+
 
 static inline void One(void)
 {
@@ -217,15 +219,18 @@ static void InitIR(void)
 
 int main(void)
 {
+    int i;
+    time_t tnow;
     daikin_msg msg;
     struct sched_param sched;
     
     memset(&sched, 0, sizeof(struct sched_param));
     memset(&msg, 0, sizeof(daikin_msg));
 
-    printf("Raspberry Pi Daikin [%i ,%i , %i, %i]\n", sizeof(msg.cmd_a), sizeof(msg.cmd_b), sizeof(msg.cmd_c), sizeof(daikin_msg));
+    printf("Raspberry Pi Daikin Emura v.%d.%d.%d\n", VER_MAJ, VER_MIN, VER_REV);
+    //printf("[%i ,%i , %i, %i]\n", sizeof(msg.cmd_a), sizeof(msg.cmd_b), sizeof(msg.cmd_c), sizeof(daikin_msg));
     
-    sched.sched_priority = 8;        /* set priority */
+    sched.sched_priority = 8;  // set priority
 
     if ( sched_setscheduler(getpid(), SCHED_FIFO, &sched) < 0 )
         fprintf(stderr, "SETSCHEDULER failed - err = %s\n", strerror(errno));
@@ -236,32 +241,40 @@ int main(void)
     msg.cmd_a.header_0 = DAIKIN_HDR_0;
     msg.cmd_a.header_1 = DAIKIN_HDR_1;
     msg.cmd_a.header_2 = DAIKIN_HDR_2;
-    msg.cmd_a.dummy4 = 0xC5;
+    msg.cmd_a.dummy4 = 0xC5; // fixed value (not decodec)
     msg.cmd_a.dummy5 = 0x10;
 
     msg.cmd_b.header_0 = DAIKIN_HDR_0;
     msg.cmd_b.header_1 = DAIKIN_HDR_1;
     msg.cmd_b.header_2 = DAIKIN_HDR_2;
-    msg.cmd_b.dummy4 = 0x42;
+    msg.cmd_b.dummy4 = 0x42; // fixed value (not decodec)
 
     msg.cmd_c.header_0 = DAIKIN_HDR_0;
     msg.cmd_c.header_1 = DAIKIN_HDR_1;
     msg.cmd_c.header_2 = DAIKIN_HDR_2;
-    msg.cmd_c.dummy5_a = 0x04;
+    msg.cmd_c.dummy5_a = 0x04; // fixed value (not decodec)
     msg.cmd_c.dummy11 = 0x06;
     msg.cmd_c.dummy12 = 0x60;
     msg.cmd_c.dummy15 = 0xC1;
     msg.cmd_c.dummy16 = 0x10;
-    
-    msg.cmd_b.minutes = 0;//(time(NULL)/60)%(24*60); // minutes from midnight
-    msg.cmd_b.wday = 1;
+
+    // compose command with user data
+    tnow = time(NULL);
+    msg.cmd_b.minutes = (tnow/60)%(24*60); // minutes from midnight
+    msg.cmd_b.wday = localtime(&tnow)->tm_wday + 1; // week day
     msg.cmd_c.on_off = 1;
-    msg.cmd_c.mode = 7;
+    msg.cmd_c.mode = 6;
+    msg.cmd_c.fan = 5;
+    msg.cmd_c.swing = 1;
 
     DaikinChecksum(&msg);
     
     InitIR();
-    CmdDaikin(&msg);
+
+    for (i=0; i!=CMD_TRANSM_TIMES; i++) {
+        CmdDaikin(&msg);
+        delay(500);
+    }
     
     return 0;
 }

@@ -88,10 +88,12 @@ int main(int argc, char** argv)
     fprintf(out, "]\n");
     fclose(f);
     fclose(out);
-    
+
+#if 0
     for (index=0; index!=cnt; index++) {
         printf("O: %i 1: %i [%i.%i B.b]\n", num0[index], num1[index], (num0[index]+num1[index])/8, (num0[index]+num1[index])%8);
     }
+#endif
     
     return 0;
 }

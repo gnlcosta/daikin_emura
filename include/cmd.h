@@ -97,7 +97,7 @@ typedef struct {
         unsigned char dummy5   :1;
         
         // byte 6
-        unsigned char dummy6_a :1;    // 0
+        unsigned char dummy6_a :1;
         unsigned char temp     :4;    // 2: 18C -> 14: 30C; 0: dehumidifier
         unsigned char deumid   :3;    // 1: temperate: 6: dehumidifier
         
