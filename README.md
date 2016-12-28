@@ -2,10 +2,15 @@
 This porject permits to control a Daikin Emura using a Raspberry Pi and a IR Led.
 In other words, the software emulates the DAIKIN ARC466A1 remote control.
 
+![Alt text](img/ARC466A1.png)
+
 ## IR circuit
 IR transmission must be 38Khz, to reach this frequency we use pin 12 (GPIO 18) where we can use (HW) PWM output.
 IR Led type: 940nm
+
 Schematic:
+
+![Alt text](img/ir_transmit.png)
 
 ## Board/OS supported:
   - Raspberry Pi Linux
