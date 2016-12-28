@@ -93,20 +93,20 @@ typedef struct {
         // byte 5
         unsigned char on_off   :1;    // 1: on, 0: off
         unsigned char dummy5_a :3;
-        unsigned char mode     :3;    // 0:auto; 2:deumidificatore; 3:climatizzatore; 4:pompa di calore; 6:ventilatore
+        unsigned char mode     :3;    // 0:auto; 2:dehumidifier; 3:air conditioning; 4:heat pump; 6:fan
         unsigned char dummy5   :1;
         
         // byte 6
         unsigned char dummy6_a :1;    // 0
-        unsigned char temp     :4;    // 2: 18C -> 14: 30C; 0: deumidificatore
-        unsigned char deumid   :3;    // 1: temperatura: 6: deumidificatore
+        unsigned char temp     :4;    // 2: 18C -> 14: 30C; 0: dehumidifier
+        unsigned char deumid   :3;    // 1: temperate: 6: dehumidifier
         
         // byte 7
         unsigned char dummy7:8;
         
         // byte 8
         unsigned char swing    :4;    // 0:off; 15:on
-        unsigned char fan      :4;    // 3:fan1; 4:fan2; 5:fan3; 6:fan4; 7:fan5; 10:auto; 11:notte
+        unsigned char fan      :4;    // 3:fan1; 4:fan2; 5:fan3; 6:fan4; 7:fan5; 10:auto; 11:night
         
         // byte 9
         unsigned char dummy8:8;
