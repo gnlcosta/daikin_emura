@@ -1,1 +1,6 @@
 cmds/*
+*.o
+decode
+compare
+daikin_emura
+.depend

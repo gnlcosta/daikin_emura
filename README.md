@@ -19,7 +19,7 @@ Schematic:
 ## Dependencies
   - wiringPi
 
-## Applications an contents
+## Applications and contents
   - daikin_emura: it sends the command to Daikin Emura conditioner
   - cmds_raw: this dir contains all data (raw format) captured using an IR receiver LIRC (sudo mode2 -d /dev/lirc0 -m > <file>)
   - decode: it converts the raw data (LIRC capture) in a bit stream (see the cmds dir content after the make)
