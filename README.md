@@ -1,4 +1,4 @@
-# Daikin Emura
+# Daikin Emura (in development)
 This porject permits to control a **Daikin Emura** using a Raspberry Pi and a IR Led.
 In other words, the software emulates the **DAIKIN ARC466A1** remote control.
 
@@ -18,6 +18,9 @@ Schematic:
 
 ## Dependencies
   - wiringPi
+  
+## Send a command to Emura
+Coming soon
 
 ## Applications and contents
   - daikin_emura: it sends the command to Daikin Emura conditioner
