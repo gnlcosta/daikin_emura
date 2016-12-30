@@ -51,6 +51,7 @@
 
 #define CMD_TRANSM_TIMES     3
 
+#define FILE_LINE_MAX_SIZE   512
 
 static inline void One(void)
 {
@@ -217,25 +218,173 @@ static void InitIR(void)
 }
 
 
-int main(void)
+static void Usage(const char *app)
+{
+    printf("Usage:\n%s commands_file.cmd\n", app);
+    printf("Exmaple commands_file.cmd:\n");
+    printf("\t# On/Off Emura 0:Off; 1:On\n");
+    printf("\ton_off 1\n");
+    printf("\t# Mode  0:auto; 1:dehumidifier; 2:air conditioning; 3:heat pump; 4:fan\n");
+    printf("\tmode 0\n");
+    printf("\t# Temperature 18 to 30 C\n");
+    printf("\ttemp 18\n");
+    printf("\t# Fan 0:fan1; 1:fan2; 2:fan3; 3:fan4; 4:fan5; 5:auto; 6:night\n");
+    printf("\tfan 5\n");
+    printf("\t# Comfort 0:Off; 1:On\n");
+    printf("\tcomfort 0\n");
+    printf("\t# Swing 0:Off; 1:On\n");
+    printf("\tswing 0\n");
+    printf("\t# Powerful 0:Off; 1:On\n");
+    printf("\tpowerful 0\n");
+    printf("\t# Quiet 0:Off; 1:On\n");
+    printf("\tquiet 0\n");
+    printf("\t# Sensor 0:Off; 1:On\n");
+    printf("\tsensor 0\n");
+    printf("\t# Econo 0:Off; 1:On\n");
+    printf("\tecono 0\n");
+}
+
+
+int main(int argc, char **argv)
 {
     int i;
     time_t tnow;
     daikin_msg msg;
     struct sched_param sched;
-    
     memset(&sched, 0, sizeof(struct sched_param));
     memset(&msg, 0, sizeof(daikin_msg));
+    unsigned char comfort, on_off, mode, temp, deumid, fan, swing, powerful, quiet, sensor, econo;
+    FILE *fpcmd;
+    char line[FILE_LINE_MAX_SIZE];
+    char param[FILE_LINE_MAX_SIZE];
+    int value;
+    
 
     printf("Raspberry Pi Daikin Emura v.%d.%d.%d\n", VER_MAJ, VER_MIN, VER_REV);
-    //printf("[%i ,%i , %i, %i]\n", sizeof(msg.cmd_a), sizeof(msg.cmd_b), sizeof(msg.cmd_c), sizeof(daikin_msg));
-    
-    sched.sched_priority = 8;  // set priority
+    if (argc != 2) {
+        Usage(argv[0]);
+        return -1;
+    }
 
-    if ( sched_setscheduler(getpid(), SCHED_FIFO, &sched) < 0 )
-        fprintf(stderr, "SETSCHEDULER failed - err = %s\n", strerror(errno));
-    else
-        printf("Priority set to \"%d\"\n", sched.sched_priority);
+    // default value
+    comfort = 0; // off
+    on_off = 0; // off
+    mode = 6; // fan
+    temp = 18; // 18C
+    deumid = 1;
+    fan = 10; // auto
+    swing = 0; // off
+    powerful = 0; // off
+    quiet = 0; // off
+    sensor = 0; // off
+    econo = 0; // off 
+
+    // read command file
+    fpcmd = fopen(argv[1], "r");
+    if (fpcmd != NULL) {
+        while (fgets(line, FILE_LINE_MAX_SIZE, fpcmd) != NULL) {
+            if (line[0] == '#')
+                continue;
+
+            i = sscanf(line, "%s %d", param, &value);
+            if (i != 2)
+                continue;
+                
+            if (strcmp(param, "on_off") == 0) {
+                if (value == 1)
+                    on_off = 1;
+            }
+            else if (strcmp(param, "mode") == 0) {
+                switch (value) {
+                case 0: // auto
+                    mode = 0;
+                    break;
+                
+                case 1: // dehumidifier
+                    mode = 2;
+                    break;
+                   
+                case 2: // air conditioning
+                    mode = 3;
+                    break;
+                   
+                case 3: // heat pump
+                    mode = 4;
+                    break;
+                   
+                case 4: // fan
+                    mode = 6;
+                    break;
+                }
+            }
+            else if (strcmp(param, "temp") == 0) {
+                if (value > 17 && value < 31) {
+                    temp = value;
+                }
+            }
+            else if (strcmp(param, "fan") == 0) {
+                switch (value) {
+                case 0: // level 1
+                    fan = 3;
+                    break;
+                    
+                case 1: // level 2
+                    fan = 4;
+                    break;
+                    
+                case 2: // level 3
+                    fan = 5;
+                    break;
+                    
+                case 3: // level 4
+                    fan = 6;
+                    break;
+                    
+                case 4: // level 5
+                    fan = 7;
+                    break;
+                    
+                case 5: // auto
+                    fan = 10;
+                    break;
+                    
+                case 6: // night
+                    fan = 11;
+                    break;
+                }
+            }
+            else if (strcmp(param, "comfort") == 0) {
+                if (value == 1) {
+                    comfort = 1;
+                }
+            }
+            else if (strcmp(param, "swing") == 0) {
+                if (value == 1) {
+                    swing = 1;
+                }
+            }
+            else if (strcmp(param, "powerful") == 0) {
+                if (value == 1) {
+                    powerful = 1;
+                }
+            }
+            else if (strcmp(param, "quiet") == 0) {
+                if (value == 1) {
+                    quiet = 1;
+                }
+            }
+            else if (strcmp(param, "sensor") == 0) {
+                if (value == 1) {
+                    sensor = 1;
+                }
+            }
+            else if (strcmp(param, "econo") == 0) {
+                if (value == 1) {
+                    econo = 1;
+                }
+            }
+        }
+    }
 
     // fixed bit/byte
     msg.cmd_a.header_0 = DAIKIN_HDR_0;
@@ -259,21 +408,41 @@ int main(void)
     msg.cmd_c.dummy16 = 0x10;
 
     // compose command with user data
+    msg.cmd_a.comfort = comfort;
+    
     tnow = time(NULL);
     msg.cmd_b.minutes = (tnow/60)%(24*60); // minutes from midnight
     msg.cmd_b.wday = localtime(&tnow)->tm_wday + 1; // week day
-    msg.cmd_c.on_off = 1;
-    msg.cmd_c.mode = 6;
-    msg.cmd_c.fan = 5;
-    msg.cmd_c.swing = 1;
+
+    msg.cmd_c.on_off = on_off;
+    msg.cmd_c.mode = mode;
+    msg.cmd_c.temp = (temp-18+2);
+    msg.cmd_c.deumid = deumid;
+    msg.cmd_c.fan = fan;
+    if (swing) {
+        msg.cmd_c.swing = 15;
+    }
+    else {
+        msg.cmd_c.swing = 0;
+    }
+    msg.cmd_c.powerful = powerful;
+    msg.cmd_c.quiet = quiet;
+    msg.cmd_c.sensor = sensor;
+    msg.cmd_c.econo = econo;
 
     DaikinChecksum(&msg);
+
+    sched.sched_priority = 8;  // set priority
+    if ( sched_setscheduler(getpid(), SCHED_FIFO, &sched) < 0 )
+        fprintf(stderr, "SETSCHEDULER failed - err = %s\n", strerror(errno));
+    else
+        printf("Priority set to \"%d\"\n", sched.sched_priority);
     
     InitIR();
 
     for (i=0; i!=CMD_TRANSM_TIMES; i++) {
         CmdDaikin(&msg);
-        delay(500);
+        delay(150);
     }
     
     return 0;
