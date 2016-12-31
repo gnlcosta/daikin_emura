@@ -1,8 +1,8 @@
-# Daikin Emura (in development)
-This porject permits to control a **Daikin Emura** using a Raspberry Pi and a IR Led.
+# Daikin Emura
+This porject permits to control a **Daikin Emura** using a **Raspberry Pi** and a IR Led.
 In other words, the software emulates the **DAIKIN ARC466A1** remote control.
 
-![Alt text](img/ARC466A1.png)
+![github clone url link](img/ARC466A1.png)
 
 ## IR circuit
 IR transmission must be 38Khz, to reach this frequency we use pin 12 (GPIO 18) where we can use (HW) PWM output.
@@ -11,16 +11,73 @@ IR led type: 940nm
 
 Schematic:
 
-![Alt text](img/ir_transmit.png)
+![IR schema](img/ir_transmit.png)
 
 ## Board/OS supported:
   - Raspberry Pi Linux
 
 ## Dependencies
   - wiringPi
+  - Python (to analyse the commands sniffed with IR receiver)
   
+## Compile
+Install dependencies:
+```
+sudo apt-get install wiringpi
+```
+Clone project:
+```
+git clone https://github.com/gnlcosta/daikin_emura.git
+```
+Compile:
+```
+cd daikin_emura/
+make
+```
+
 ## Send a command to Emura
-Coming soon
+The applicazion 'daikin_emura' permits to send commands to Emura. This program has only one parameter as input, the commands file.
+```
+./daikin_emura <commands_file>
+```
+The "commands file" is composed by a list of the commands (configurations) which will be sent to Emura. These commands can be:
+ - **on_off**: to turn on or off Emura
+  - 0: off
+  - 1: on
+ - **mode**: to set the operational mode
+  - 0: auto
+  - 1: dehumidifier
+  - 2: air conditioning
+  - 3: heat pump
+  - 4: fan
+ - **temp**: to set the Temperature in °C
+  - from 18
+  - to 30
+ - **fan**: to set the fan speed
+  - from 0 to 5: speed
+  - 6: auto
+  - 7: night
+ - **comfort**: to turn on or off comfort
+  - 0: off
+  - 1: on
+ - **swing**: to turn on or off swing
+  - 0: off
+  - 1: on
+ - **powerful**: to turn on or off powerful
+  - 0: off
+  - 1: on
+ - **quiet**: to turn on or off sensor
+  - 0: off
+  - 1: on
+ - **sensor**:  to turn on or off sensor
+  - 0: off
+  - 1: on
+ - **econo**: to turn on or off econo
+  - 0: off
+  - 1: on
+A line that start with '#' is considered as comment.
+
+[Here](emura_params.cmd) you can see and example of this "commands file".
 
 ## Applications and contents
   - daikin_emura: it sends the command to Daikin Emura conditioner
