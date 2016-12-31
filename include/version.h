@@ -24,6 +24,6 @@
 
 #define VER_MAJ 0
 #define VER_MIN 1
-#define VER_REV 0
+#define VER_REV 1
 
 #endif

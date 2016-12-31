@@ -414,6 +414,11 @@ int main(int argc, char **argv)
     msg.cmd_b.minutes = (tnow/60)%(24*60); // minutes from midnight
     msg.cmd_b.wday = localtime(&tnow)->tm_wday + 1; // week day
 
+    if (mode == 2) {
+        deumid = 6;
+        temp = 0;
+    }
+
     msg.cmd_c.on_off = on_off;
     msg.cmd_c.mode = mode;
     msg.cmd_c.temp = (temp-18+2);
