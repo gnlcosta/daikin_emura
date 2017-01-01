@@ -1,6 +1,6 @@
-# Daikin Emura
-This porject permits to control a **Daikin Emura** using a **Raspberry Pi** and a IR Led.
-In other words, the software emulates the **DAIKIN ARC466A1** remote control.
+# Daikin Emura FTXG-JW
+This porject permits to control a **Daikin Emura FTXG-JW** using a **Raspberry Pi** and a IR Led.
+In other words, the software emulates the **DAIKIN ARC466A1** remote control used with Daikin Emura FTXG35JV1BW.
 
 ![github clone url link](img/ARC466A1.png)
 
