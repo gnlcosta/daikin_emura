@@ -75,6 +75,7 @@ The "commands file" is composed by a list of the commands (configurations) which
  - **econo**: to turn on or off econo
   - 0: off
   - 1: on
+  
 A line that start with '#' is considered as comment.
 
 [Here](emura_params.cmd) you can see an example of this "commands file".
